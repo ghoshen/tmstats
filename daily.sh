@@ -96,7 +96,7 @@ if [[ "$dorun" = "yes" ]] ; then
         rc=$?
         echo "allstats rc = $rc"
         if [[ "$rc" == 0 ]] ; then
-            isreal && cp performance.html ~/www/files/reports/
+            isreal && cp performance.html ${reportdir}/
         fi
 
     fi
@@ -117,11 +117,11 @@ if [[ "$dorun" = "yes" ]] ; then
         rc=$?
         echo "makeeducationals rc = $rc"
         if [[ "$rc" == 0 ]] ; then
-            isreal && cp recentawards.* ~/www/files/reports
+            isreal && cp recentawards.* ${reportdir}
         fi
         
         # Make a TSV of this year's awards
-        echo "select awards.* from awards inner join (select max(tmyear) as y from awards) a on awards.tmyear = a.y;" | mysql d101tm_tmstats  --batch --raw --silent > awards.tsv && isreal && cp awards.tsv ~/www/files/reports
+        echo "select awards.* from awards inner join (select max(tmyear) as y from awards) a on awards.tmyear = a.y;" | mysql d101tm_tmstats  --batch --raw --silent > awards.tsv && isreal && cp awards.tsv ${reportdir}
 
         # convert "recentawards.jpg" -resize 100x65 "100x65_recentawards.jpg"
 
@@ -129,62 +129,62 @@ if [[ "$dorun" = "yes" ]] ; then
         # Stellar September starts with August data and continues through September 15
         if $SCRIPTPATH/require.py --newtmyear --datafor S8 --nodatafor 9/16 ; then
             echo "Running Stellar September"
-            $SCRIPTPATH/renewals.py --program "stellar" --pct 75 100 --earn 75 100 && isreal && cp stellar.* ~/www/files/reports
+            $SCRIPTPATH/renewals.py --program "stellar" --pct 75 100 --earn 75 100 && isreal && cp stellar.* ${reportdir}
         fi
 
         # March Madness starts with February data and continues through March 15
         if $SCRIPTPATH/require.py --datafor S2 --nodatafor 3/16 ; then
             echo "Running March Madness"
-            $SCRIPTPATH/renewals.py --program "madness" --pct 75 100 --earn 75 100 && isreal && cp madness.* ~/www/files/reports
+            $SCRIPTPATH/renewals.py --program "madness" --pct 75 100 --earn 75 100 && isreal && cp madness.* ${reportdir}
         fi
 
         # President's Club runs once we have February data and stops when we have May 1 data
         if $SCRIPTPATH/require.py --datafor S2 --nodatafor 5/1 ; then
             echo "Running President's Club"
-            $SCRIPTPATH/presidentsclub.py --finaldate 4/30 && isreal && cp presidentsclub.txt ~/www/files/reports/
+            $SCRIPTPATH/presidentsclub.py --finaldate 4/30 && isreal && cp presidentsclub.txt ${reportdir}/
         fi
 
         # Early Achievers starts when we have data for the new year and ends when we have November data
         if $SCRIPTPATH/require.py --newtmyear --nodatafor S11 ; then
             echo "Running Early Achievers"
-            $SCRIPTPATH/earlyachievers.py && isreal && cp earlyachievers.* ~/www/files/reports/
+            $SCRIPTPATH/earlyachievers.py && isreal && cp earlyachievers.* ${reportdir}/
         fi
         
         # Take a Leap runs once we have April data and stops when we have data for the next year
         if false && $SCRIPTPATH/require.py --datafor S4 --oldtmyear ; then
             echo "Running Take A Leap"
-            $SCRIPTPATH/takealeap.py && isreal && cp takealeap.* ~/www/files/reports/
+            $SCRIPTPATH/takealeap.py && isreal && cp takealeap.* ${reportdir}/
         fi
 
         # Spring Forward runs once we have April data and stops when we have data for the next year
         if false && $SCRIPTPATH/require.py --datafor S5 --oldtmyear ; then
             echo "Running Spring Forward"
-            $SCRIPTPATH/springforward.py && isreal && cp springforward.* ~/www/files/reports
+            $SCRIPTPATH/springforward.py && isreal && cp springforward.* ${reportdir}
         fi
 
         # Bring Back the Base starts when we have April data and ends when we have June 30 data.
 
         if $SCRIPTPATH/require.py --datafor S4 --nodatafor 6/30 --oldtmyear ; then
             echo "Running Bring Back Your Base"
-            $SCRIPTPATH/bringbackyourbase.py && isreal && cp bringbackyourbase* ~/www/files/reports
+            $SCRIPTPATH/bringbackyourbase.py && isreal && cp bringbackyourbase* ${reportdir}
         fi
 
         # Rev Up Your Engines starts with the end of May and ends on June 30.
         if $SCRIPTPATH/require.py --datafor M5 --nodatafor 6/30 --oldtmyear ; then
             echo "Running Rev Up Your Engines"
-            $SCRIPTPATH/revup.py && isreal && cp revup* ~/www/files/reports
+            $SCRIPTPATH/revup.py && isreal && cp revup* ${reportdir}
         fi
 
         # Sensational Summer runs once we have April data and stops when we have data for the next year
         if $SCRIPTPATH/require.py --datafor S5 --oldtmyear ; then
             echo "Running Sensational Summer"
-            $SCRIPTPATH/summer.py && isreal && cp summer.* ~/www/files/reports
+            $SCRIPTPATH/summer.py && isreal && cp summer.* ${reportdir}
         fi
 
         # Five for 5 runs once we have April data and stops when we get data for 5/16.
         if false && $SCRIPTPATH/require.py --datafor S4 --nodatafor 5/16; then
             echo "Running Five for 5"
-            $SCRIPTPATH/fivefor5.py && isreal && (cp fivefor5.html ~/www/files/reports; $SCRIPTPATH/sendmail.py --subject "Five for 5 Report" --to quality@d101tm.org --html fivefor5.email)
+            $SCRIPTPATH/fivefor5.py && isreal && (cp fivefor5.html ${reportdir}; $SCRIPTPATH/sendmail.py --subject "Five for 5 Report" --to quality@d101tm.org --html fivefor5.email)
         fi
 
     fi
@@ -205,15 +205,15 @@ if [[ "$dorun" = "yes" ]] ; then
         (cd $SCRIPTPATH;./dodailyalignment.sh)
 		
 		echo "Creating anniversary table"
-		(cd $SCRIPTPATH/;./makeanniversarytable.py) && isreal && cp anniversary.csv ~/www/files/reports
+		(cd $SCRIPTPATH/;./makeanniversarytable.py) && isreal && cp anniversary.csv ${reportdir}
 
         echo "Creating online clubs report"
-        (cd $SCRIPTPATH/;./makeonlinereport.py) && isreal && cp onlineclubs.html ~/www/files/reports
+        (cd $SCRIPTPATH/;./makeonlinereport.py) && isreal && cp onlineclubs.html ${reportdir}
 
     fi
 
     echo "Updating anniversary open houses"
-    (cd $SCRIPTPATH/;./updateanniversaryopenhouses.py) && isreal && cp amazing.txt ~/www/files/reports
+    (cd $SCRIPTPATH/;./updateanniversaryopenhouses.py) && isreal && cp amazing.txt ${reportdir}
 
     # Now, ingest rosters if need be
     echo "Checking for a new roster"
